@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Bayena</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7BA428;
+            --primary-dark: #6B9220;
+            --primary-light: #8DB836;
+            --accent: #9FBC32;
+            --text-dark: #1a1a1a;
+            --text-light: #666666;
+            --bg-light: #f9faf7;
+            --bg-white: #ffffff;
+            --border: #e0e0d0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-button {
+            position: absolute;
+            right: 2rem;
+            top: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sidebar + Content */
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-list {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-right: 3px solid transparent;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: var(--primary);
+            background: rgba(123, 164, 40, 0.08);
+            border-right-color: var(--primary);
+        }
+
+        /* Main Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section {
+            background: var(--bg-white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            scroll-margin-top: 100px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section h3 {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+        }
+
+        .section p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .code-block code {
+            color: var(--code-text);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-copy {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .code-copy:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Endpoint Card */
+        .endpoint-card {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 6px;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .endpoint-method.get {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .endpoint-method.post {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .endpoint-method.put {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Response Box */
+        .response-box {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .response-label {
+            color: var(--code-text);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .response-code {
+            color: #4ec9b0;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Button */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-box {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .code-block {
+                overflow-x: auto;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="./index.html" class="back-button">←</a>
+        <div class="header-content">
+            <h1>Bayena API</h1>
+            <p>واجهة برمجية قوية للوصول إلى بيانات البيئة</p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="content-wrapper">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-title">التنقل</div>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item">
+                        <a href="#overview" class="sidebar-link active" onclick="setActive(this)">نظرة عامة</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#auth" class="sidebar-link" onclick="setActive(this)">المصادقة</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#endpoints" class="sidebar-link" onclick="setActive(this)">نقاط النهاية</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#examples" class="sidebar-link" onclick="setActive(this)">أمثلة</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#sdks" class="sidebar-link" onclick="setActive(this)">مكتبات</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#errors" class="sidebar-link" onclick="setActive(this)">معالجة الأخطاء</a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="content">
+                <!-- Overview -->
+                <section id="overview" class="section">
+                    <h2>نظرة عامة على API</h2>
+                    <p>توفر منصة Bayena واجهة برمجية RESTful قوية تتيح للمطورين الوصول إلى بيانات البيئة الموحدة والشاملة.</p>
+
+                    <h3>المميزات الرئيسية:</h3>
+                    <div class="features-grid">
+                        <div class="feature-box">
+                            <div class="feature-icon">⚡</div>
+                            <div class="feature-title">سريعة وموثوقة</div>
+                            <div class="feature-desc">استجابة فورية مع ضمان توفر 99.9%</div>
+                        </div>
+                        <div class="feature-box">
+                            <div class="feature-icon">🔒</div>
+                            <div class="feature-title">آمنة</div>
+                            <div class="feature-desc">مصادقة JWT وتشفير من طرف إلى طرف</div>
+                        </div>
+                        <div class="feature-box">
+                            <div class="feature-icon">📚</div>
+                            <div class="feature-title">موثقة بالكامل</div>
+                            <div class="feature-desc">توثيق شامل مع أمثلة عملية</div>
+                        </div>
+                        <div class="feature-box">
+                            <div class="feature-icon">🌍</div>
+                            <div class="feature-title">عالمية</div>
+                            <div class="feature-desc">خوادم موزعة في مناطق متعددة</div>
+                        </div>
+                    </div>
+
+                    <h3>الإصدار الحالي: v1</h3>
+                    <p>عنوان الأساس: <code style="background: var(--bg-light); padding: 0.2rem 0.4rem; border-radius: 3px;">https://api.bayena.io/v1</code></p>
+                </section>
+
+                <!-- Authentication -->
+                <section id="auth" class="section">
+                    <h2>المصادقة</h2>
+                    <p>جميع طلبات API تتطلب مفتاح API صحيح. يتم نقل المفتاح عبر رأس Authorization.</p>
+
+                    <h3>الحصول على مفتاح API</h3>
+                    <p>1. سجل حساباً على <a href="#" style="color: var(--primary);">لوحة التحكم</a></p>
+                    <p>2. انتقل إلى قسم API Keys</p>
+                    <p>3. انقر على "إنشاء مفتاح جديد"</p>
+
+                    <h3>استخدام المفتاح</h3>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>curl -H "Authorization: Bearer YOUR_API_KEY" \
+  https://api.bayena.io/v1/data/air-quality</code>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <strong>أو في JavaScript:</strong>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>const response = await fetch('https://api.bayena.io/v1/data/air-quality', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  }
+});
+const data = await response.json();</code>
+                    </div>
+                </section>
+
+                <!-- Endpoints -->
+                <section id="endpoints" class="section">
+                    <h2>نقاط النهاية الرئيسية</h2>
+
+                    <h3>بيانات جودة الهواء</h3>
+                    <div class="endpoint-card">
+                        <span class="endpoint-method get">GET</span>
+                        <span class="endpoint-path">/data/air-quality</span>
+                        <p style="margin-top: 0.5rem; margin-bottom: 0;">الحصول على بيانات جودة الهواء الحالية والتاريخية</p>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>GET /v1/data/air-quality?city=riyadh&days=7
+Authorization: Bearer YOUR_API_KEY</code>
+                    </div>
+
+                    <div class="response-label">استجابة نموذجية:</div>
+                    <div class="response-box">
+                        <div class="response-code">
+                            {<br>
+                            &nbsp;&nbsp;"status": "success",<br>
+                            &nbsp;&nbsp;"data": {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;"city": "riyadh",<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;"aqi": 78,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;"pm25": 35,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;"pm10": 65,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;"timestamp": "2024-03-16T10:00:00Z"<br>
+                            &nbsp;&nbsp;}<br>
+                            }
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 2rem;">بيانات نوعية المياه</h3>
+                    <div class="endpoint-card">
+                        <span class="endpoint-method get">GET</span>
+                        <span class="endpoint-path">/data/water-quality</span>
+                        <p style="margin-top: 0.5rem; margin-bottom: 0;">الحصول على بيانات نوعية المياه</p>
+                    </div>
+
+                    <h3 style="margin-top: 2rem;">إرسال بيانات جديدة</h3>
+                    <div class="endpoint-card">
+                        <span class="endpoint-method post">POST</span>
+                        <span class="endpoint-path">/data/submit</span>
+                        <p style="margin-top: 0.5rem; margin-bottom: 0;">إرسال بيانات جديدة إلى المنصة</p>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>POST /v1/data/submit
+Content-Type: application/json
+Authorization: Bearer YOUR_API_KEY
+
+{
+  "type": "air-quality",
+  "city": "riyadh",
+  "aqi": 78,
+  "pm25": 35,
+  "timestamp": "2024-03-16T10:00:00Z"
+}</code>
+                    </div>
+                </section>
+
+                <!-- Examples -->
+                <section id="examples" class="section">
+                    <h2>أمثلة عملية</h2>
+
+                    <h3>مثال 1: الحصول على بيانات جودة الهواء</h3>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>import requests
+
+API_KEY = 'your_api_key_here'
+BASE_URL = 'https://api.bayena.io/v1'
+
+headers = {
+    'Authorization': f'Bearer {API_KEY}',
+    'Content-Type': 'application/json'
+}
+
+response = requests.get(
+    f'{BASE_URL}/data/air-quality',
+    params={'city': 'riyadh', 'days': 7},
+    headers=headers
+)
+
+data = response.json()
+print(data)</code>
+                    </div>
+
+                    <h3>مثال 2: إرسال بيانات جديدة (Python)</h3>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>import requests
+from datetime import datetime
+
+payload = {
+    "type": "air-quality",
+    "city": "riyadh",
+    "aqi": 78,
+    "pm25": 35,
+    "pm10": 65,
+    "temperature": 28,
+    "humidity": 45,
+    "timestamp": datetime.now().isoformat()
+}
+
+response = requests.post(
+    f'{BASE_URL}/data/submit',
+    json=payload,
+    headers=headers
+)
+
+print(response.json())</code>
+                    </div>
+                </section>
+
+                <!-- SDKs -->
+                <section id="sdks" class="section">
+                    <h2>مكتبات وأدوات</h2>
+
+                    <h3>Python SDK</h3>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>pip install bayena-sdk
+
+from bayena import BayenaClient
+
+client = BayenaClient(api_key='YOUR_API_KEY')
+data = client.get_air_quality(city='riyadh', days=7)
+print(data)</code>
+                    </div>
+
+                    <h3>JavaScript/Node.js SDK</h3>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>npm install bayena-sdk
+
+const { BayenaClient } = require('bayena-sdk');
+
+const client = new BayenaClient({ apiKey: 'YOUR_API_KEY' });
+const data = await client.getAirQuality({ city: 'riyadh', days: 7 });
+console.log(data);</code>
+                    </div>
+                </section>
+
+                <!-- Error Handling -->
+                <section id="errors" class="section">
+                    <h2>معالجة الأخطاء</h2>
+
+                    <h3>رموز الأخطاء الشائعة</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+                        <tr style="background: var(--bg-light);">
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);"><strong>الرمز</strong></td>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);"><strong>الوصف</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">400</td>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">طلب غير صحيح</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">401</td>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">مفتاح API غير صحيح</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">429</td>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">تجاوز حد المعدل</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">500</td>
+                            <td style="padding: 0.8rem; border: 1px solid var(--border);">خطأ في الخادم</td>
+                        </tr>
+                    </table>
+
+                    <h3>معالجة الأخطاء</h3>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">نسخ</button>
+                        <code>try {
+  const response = await fetch('https://api.bayena.io/v1/data/air-quality', {
+    headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('API Error:', error.message);
+    return;
+  }
+  
+  const data = await response.json();
+  console.log('Success:', data);
+} catch (error) {
+  console.error('Network Error:', error);
+}</code>
+                    </div>
+
+                    <button class="btn-primary" onclick="window.location.href='mailto:support@bayena.io'">اتصل بالدعم</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setActive(link) {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+
+        function copyCode(button) {
+            const code = button.nextElementSibling.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'تم النسخ!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

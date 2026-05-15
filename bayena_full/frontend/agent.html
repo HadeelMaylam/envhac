@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الوكيل الذكي - Bayena</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7BA428;
+            --primary-dark: #6B9220;
+            --primary-light: #8DB836;
+            --accent: #9FBC32;
+            --text-dark: #1a1a1a;
+            --text-light: #666666;
+            --bg-light: #f9faf7;
+            --bg-white: #ffffff;
+            --border: #e0e0d0;
+            --chat-user: #7BA428;
+            --chat-agent: #f0f3eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .logo-header {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .header-info {
+            text-align: right;
+        }
+
+        .header-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            height: calc(100vh - 70px);
+            background: var(--bg-light);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-left: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .new-chat-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-list {
+            list-style: none;
+            flex: 1;
+        }
+
+        .history-item {
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            border-left: 3px solid transparent;
+        }
+
+        .history-item:hover {
+            background: #e8ecde;
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-light);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message.agent {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: var(--chat-agent);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+        }
+
+        .message.agent .message-content {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(123, 164, 40, 0.2);
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+            text-align: center;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 1.5rem 2rem;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .input-container {
+            flex: 1;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(123, 164, 40, 0.1);
+        }
+
+        .send-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .send-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .attachment-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .attachment-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Suggested Prompts */
+        .suggested-prompts {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .prompt-card {
+            background: var(--bg-white);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(123, 164, 40, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .prompt-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .prompt-card-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .prompt-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Empty State */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-text {
+            color: var(--text-light);
+            max-width: 400px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .container {
+                width: 100%;
+            }
+
+            .message-content {
+                max-width: 90%;
+            }
+
+            .suggested-prompts {
+                grid-template-columns: 1fr;
+            }
+
+            .input-area {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <a href="./index.html" class="back-button">←</a>
+            <div>
+                <div class="logo-header">Bayena</div>
+            </div>
+        </div>
+        <div class="header-info">
+            <div class="header-title">الوكيل الذكي</div>
+            <div class="header-subtitle">متصل وجاهز للمساعدة</div>
+        </div>
+        <button class="menu-button">⋮</button>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="new-chat-btn">+ محادثة جديدة</button>
+            <div class="history-title">السجل</div>
+            <ul class="history-list">
+                <li class="history-item">تحليل بيانات الانبعاثات</li>
+                <li class="history-item">تقرير جودة الهواء</li>
+                <li class="history-item">إحصائيات استهلاك المياه</li>
+                <li class="history-item">متوسط درجات الحرارة</li>
+            </ul>
+        </aside>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message agent">
+                    <div>
+                        <div class="message-content">
+                            مرحباً! أنا وكيل Bayena الذكي 🤖
+                            <br><br>
+                            يمكنني مساعدتك في:
+                            <br>
+                            • تحليل بيانات البيئة
+                            <br>
+                            • الإجابة على استفساراتك
+                            <br>
+                            • تقديم تقارير شاملة
+                            <br><br>
+                            كيف يمكنني مساعدتك اليوم؟
+                        </div>
+                        <div class="message-time">الآن</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggested Prompts or Input -->
+            <div class="suggested-prompts" id="suggestedArea">
+                <div class="prompt-card" onclick="sendMessage('ما هي أحدث تقارير جودة الهواء؟')">
+                    <div class="prompt-card-icon">📊</div>
+                    <div class="prompt-card-title">تقارير جودة الهواء</div>
+                    <div class="prompt-card-desc">اطلب على أحدث البيانات</div>
+                </div>
+
+                <div class="prompt-card" onclick="sendMessage('ما هو مستوى الانبعاثات الحالي؟')">
+                    <div class="prompt-card-icon">💨</div>
+                    <div class="prompt-card-title">مستويات الانبعاثات</div>
+                    <div class="prompt-card-desc">تحليل الانبعاثات الحالية</div>
+                </div>
+
+                <div class="prompt-card" onclick="sendMessage('كم معدل استهلاك المياه؟')">
+                    <div class="prompt-card-icon">💧</div>
+                    <div class="prompt-card-title">استهلاك المياه</div>
+                    <div class="prompt-card-desc">معلومات عن الموارد المائية</div>
+                </div>
+
+                <div class="prompt-card" onclick="sendMessage('أعطني ملخص عام عن حالة البيئة')">
+                    <div class="prompt-card-icon">🌍</div>
+                    <div class="prompt-card-title">ملخص عام</div>
+                    <div class="prompt-card-desc">نظرة شاملة على البيانات</div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <button class="attachment-btn">📎</button>
+                    <input 
+                        type="text" 
+                        class="input-field" 
+                        id="messageInput"
+                        placeholder="اكتب سؤالك هنا..."
+                        onkeypress="if(event.key === 'Enter') sendMessage()"
+                    >
+                </div>
+                <button class="send-button" onclick="sendMessage()">إرسال</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage(suggestedText = null) {
+            const input = document.getElementById('messageInput');
+            const message = suggestedText || input.value.trim();
+
+            if (!message) return;
+
+            // Hide suggested prompts
+            document.getElementById('suggestedArea').style.display = 'none';
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `
+                <div>
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">الآن</div>
+                </div>
+            `;
+            chatMessages.insertBefore(userMsg, chatMessages.firstChild);
+
+            // Clear input
+            input.value = '';
+
+            // Simulate agent response
+            setTimeout(() => {
+                const agentMsg = document.createElement('div');
+                agentMsg.className = 'message agent';
+                
+                const responses = [
+                    'شكراً على سؤالك! أنا أحلل البيانات الحالية لتقديم إجابة دقيقة. يرجى الانتظار قليلاً... 📊',
+                    'بناءً على أحدث التقارير من صندوق البيئة، الوضع يظهر تحسناً طفيفاً مقارنة بالشهر الماضي. 📈',
+                    'اكتشفت معلومات مهمة في قاعدة البيانات. دعني أشارك التفاصيل معك... 🔍',
+                    'هذا سؤال رائع! البيانات تشير إلى عدة مؤشرات إيجابية. هل تريد مزيداً من التفاصيل؟ 💡'
+                ];
+
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                agentMsg.innerHTML = `
+                    <div>
+                        <div class="message-content">${randomResponse}</div>
+                        <div class="message-time">الآن</div>
+                    </div>
+                `;
+                chatMessages.insertBefore(agentMsg, chatMessages.firstChild);
+            }, 800);
+        }
+
+        // Auto-focus input
+        document.getElementById('messageInput').focus();
+    </script>
+</body>
+</html>
